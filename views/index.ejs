@@ -1,20 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-    <script src="/javascripts/socket.io.js"></script>
-    <script>
-      var socket = io.connect('http://localhost:3000');
-      socket.on('news', function (data) {
-        console.log(data);
-        socket.emit('my other event', { my: 'data' });
-      });
-    </script>
+    <style>
+        #console{
+            border:1px solid #444;
+            padding: 5px;
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100px;
+            width: 200px;
+            overflow: scroll;
+        }
+    </style>
+</head>
+<body>
+<h1><%= title %></h1>
+<p>Welcome to <%= title %></p>
+<div>
+    <p>用户名和房间</p>
+    <input type="text" placeholder="username" id="name">
+    <input type="number" placeholder="room num" id="room">
+    <button id="join">加入</button>
+</div>
+<div id="console">
 
-  </body>
+</div>
+<div class="room">
+
+</div>
+<script src="/javascripts/socket.io.js"></script>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<script>
+
+    $(document).ready(function () {
+        $('#join').on('click', ()=>{
+            join()
+        });
+
+        function join(){
+            let name = $("#name").val()
+            let room = $("#room").val()
+            log("准备加入房间");
+            var socket = io.connect(`http://localhost:3000?room=${room}&name=${name}`);
+            socket.on('roomMsg',msg => {
+                log(msg)
+            })
+            socket.on('roomPlayers',players => {
+                log(players)
+            })
+        }
+        function log(msg) {
+            console.log(msg)
+            $("#console").append(msg+"<br>");
+        }
+    });
+
+</script>
+
+</body>
 </html>
